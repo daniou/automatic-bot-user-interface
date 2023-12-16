@@ -41,6 +41,8 @@ class WindowManager:
             print(f"No se encontró la ventana con el título '{self.window_title}'")
             return None
 
+
+
     def activate_and_restore_window(self):
         if self.window:
             # Asegurarse de que la ventana no esté minimizada
@@ -83,12 +85,7 @@ class WindowManager:
             )
             screenshot.save(screenshot_path)
             print(f"Screenshot guardado en: {screenshot_path}")
-
-    # Nueva función para capturar el screenshot inicial
-    def capture_initial_screenshot(self, save_path="initial_screenshot.png"):
-        if self.window:
-            self.window_screenshot(save_path)
-            print(f"Screenshot inicial guardado en: {save_path}")
+        return screenshot_path
 
     def initialize_window(self):
         if not self.activate_and_restore_window():

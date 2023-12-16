@@ -11,7 +11,7 @@ class EventRecorder:
     def __init__(self, strategy):
         self.strategy = strategy
 
-    def record_events(self, filename):
+    def record_events(self):
         try:
             recorded = keyboard.record(until='enter')
             simplified_events = self.strategy.simplify_events(recorded)
@@ -19,9 +19,18 @@ class EventRecorder:
             simplified_events = self.strategy.calculate_durations(simplified_events)
 
             # Guardar en formato CSV
-            self.strategy.save_to_csv(filename, simplified_events)
+            return simplified_events
         except Exception as e:
             print("Error al guardar la secuencia", str(e))
+
+    def record_and_save_events(self, filename):
+        try:
+            events = self.record_events()
+            return self.strategy.save_to_csv(filename, events)
+
+        except Exception as e:
+            raise e
+
 
 
 class EventStrategy(ABC):
@@ -53,6 +62,7 @@ class DefaultEventStrategy(EventStrategy):
         with open(filename, 'w', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerows(simplified_events[:-1])
+            return filename
 
 
 class PlayerCommand:
