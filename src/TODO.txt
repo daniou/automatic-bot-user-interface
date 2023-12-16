@@ -1,0 +1,17 @@
+Actualemte ya se graba el teclado y se saca una screenshot al final.
+Ahora necesito que cada vez que le de a grabar, me saque una screenshot del estado inicial
+grabe la sequencia de comandos, y saque un screenshot del resultado final. Estas relaciones se deben persisitir.
+EJ: E0 -> COMANDOS1 -> E1 (PKL O CSV o como sea mejor persistirlo)
+
+Una vez haya generado las rutas necesarias se pasa al modo producción,
+aquí, el codigo de grabación se ignora, SE CENTRA EN LA REPRODUCCION DE LO GRABADO. Se recibe un estado objetivo y un estado inicial. Se busca entonces el estado
+objetivo y se busca la mejor y se ejecuta los pasos que indique la ruta para llegar al estado objetivo. Esto siempre haciendo comprobaciones de que el estado
+de la interfaz sea el esperado, comprobando que la shcreenshot vinculada con el estado, corresponde con lo que se ve en la interfaz en ese momento.
+que toquen (que representan las aristas del grafo)
+
+
+Finalmente se crearán unos endpoints que permitirán:
+1- añadir cliente
+2- añadir vehículo
+3- editar cliente
+4- editar vehículo
