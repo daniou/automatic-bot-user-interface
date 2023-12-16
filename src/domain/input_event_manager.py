@@ -4,7 +4,7 @@ import time
 import keyboard
 import pyautogui
 
-from src.config import WAIT_BETWEEN_INPUT_INERACTIONS_PERIOD
+from config import WAIT_BETWEEN_INPUT_INERACTIONS_PERIOD
 
 
 class EventRecorder:

@@ -2,7 +2,7 @@ import pygetwindow as gw
 import pyautogui
 import subprocess
 import time
-from src import config
+import config
 
 pyautogui.FAILSAFE = True
 

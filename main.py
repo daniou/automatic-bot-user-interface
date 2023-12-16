@@ -1,4 +1,4 @@
-from src import config
+import config
 from src.domain.input_event_manager import EventRecorder, EventPlayer, DefaultEventStrategy
 from src.domain.window_manager import WindowManager
 from src.views.sequence_recorder_controller import SequenceRecorderController
