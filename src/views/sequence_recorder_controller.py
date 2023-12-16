@@ -1,78 +1,73 @@
+import queue
 import threading
 from tkinter import filedialog
-import json
 import os
 
+
 class SequenceRecorderController:
-    def __init__(self, recorder, player, window_manager, ui_analyzer):
+    def __init__(self, recorder, player, window_manager, transition_actions_manager):
+        self.transition_actions_manager = transition_actions_manager
         self.gui = None
         self.recorder = recorder
         self.player = player
         self.window_manager = window_manager
-        self.ui_analyzer = ui_analyzer
 
     def set_gui(self, gui):
+        if gui is None:
+            raise ValueError("GUI cannot be None")
         self.gui = gui
 
-    def capture_initial_state(self):
-        # Capturar y guardar el estado inicial
-        self.window_manager.capture_initial_screenshot("initial_screenshot.png")
-        initial_state = self.ui_analyzer.get_screenshot_state("initial_screenshot.png")
-        return initial_state
-
-    def capture_final_state_and_save(self, filename):
-        # Capturar y guardar el estado final
-        final_screenshot_path = "final_screenshot.png"
-        self.window_manager.window_screenshot(final_screenshot_path)
-        final_state = self.ui_analyzer.get_screenshot_state(final_screenshot_path)
-
-        # Guardar la relación entre estados y comandos
-        data = {
-            "initial_state": self.capture_initial_state(),
-            "commands": filename,
-            "final_state": final_state
-        }
-        with open(f"{os.path.splitext(filename)[0]}_data.json", 'w') as f:
-            json.dump(data, f)
-
-        self.show_info("¡Guardado correctamente!", "La secuencia y los estados se han guardado correctamente.")
-
-    def save_file(self):
+    def record_and_save_input_events(self):
         try:
             filename = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
             if filename:
-                # Iniciar la grabación y capturar el estado inicial
-                initial_state = self.capture_initial_state()
+                init_state_screenshot_path = self.window_manager.window_screenshot("init_screenshot.png")
 
-                # Crear el hilo y almacenar una referencia
-                thread = threading.Thread(target=self.recorder.record_events, args=(filename,))
-                # Configurar el hilo para que, al finalizar, llame a show_info
+                result_queue = queue.Queue()  # Crear una cola para almacenar el resultado
+                def worker_function():
+                    actions_path = self.recorder.record_and_save_events(filename)
+                    result_queue.put(actions_path)  # Poner el resultado en la cola
+                thread = threading.Thread(target=worker_function)
                 thread.daemon = True
                 thread.start()
-                thread.join()  # Esperar a que el hilo termine
+                thread.join()
 
-                # Capturar el estado final y guardar la relación
-                self.capture_final_state_and_save(filename)
+                final_state_screenshot_path = self.window_manager.window_screenshot("final_screenshot.png")
 
+                self.transition_actions_manager.add_state_transition(
+                    init_state_screenshot_path,
+                    result_queue.get(),
+                    final_state_screenshot_path
+                )
+                self.show_info("¡Guardado correctamente!", "La secuencia y los estados se han guardado correctamente.")
         except Exception as e:
             self.show_error("Error al abrir el cuadro de diálogo de guardar", str(e))
 
-
-    def load_file(self):
+    def load_and_play_input_events(self):
         try:
             filename = filedialog.askopenfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
             if filename:
                 threading.Thread(target=self.player.play_events, args=(filename,)).start()
         except Exception as e:
-            self.show_error("Error reproducción sequencia", "Ha habido un error al intentar reproducir una sequencia",
-                            str(e))
+            self.show_error("Error reproducción sequencia", str(e))
 
     def show_error(self, title, text):
-        self.gui.info_message_box(title=title, text=text)
+        if self.gui:
+            self.gui.info_message_box(title=title, text=text)
+        else:
+            print(f"Error: {title} - {text}")
 
     def show_info(self, title, text):
-        self.gui.info_message_box(title=title, text=text)
+        if self.gui:
+            self.gui.info_message_box(title=title, text=text)
+        else:
+            print(f"Info: {title} - {text}")
 
     def run(self):
-        self.window_manager.open_and_initialize_window()
-        self.gui.run()
+        if not self.window_manager.open_and_initialize_window():
+            self.show_error("Error de ventana", "No se pudo abrir o inicializar la ventana.")
+            return
+        if self.gui:
+            self.gui.run()
+        else:
+            print("No GUI to run.")
