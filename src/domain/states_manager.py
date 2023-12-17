@@ -2,15 +2,18 @@ import os
 import pickle
 import shutil
 
+from src.domain.ui_analyzer import ui_analyzer, UIAnalyzer
+
 
 class State:
-    def __init__(self, name, screenshot_path, pkl_path):
+    def __init__(self, name, screenshot_path, pkl_path, ui):
         self.name = name
         self.screenshot_path = self.move_and_rename_screenshot(screenshot_path, name)
         self.pkl_path = pkl_path
+        self.ui = ui
 
     def move_and_rename_screenshot(self, screenshot_path, name):
-        new_path = f"state_screenshots/{name}.png"
+        new_path = f"./src/persistence/state_screenshots/{name}.png"
         os.makedirs(os.path.dirname(new_path), exist_ok=True)
         shutil.move(screenshot_path, new_path)
         return new_path
@@ -31,13 +34,14 @@ class StatesManager:
         self.load_from_pkl()
 
     def add_state(self, screenshot_path):
+        ui1 = ui_analyzer.get_ui(screenshot_path)
         for state in self.states:
-            if state.screenshot_path == screenshot_path:
+            if UIAnalyzer.are_uis_equal(ui1, state.ui):
                 return state.pkl_path
         print(f"states len: {len(self.states)}, states: {self.states}")
         state_name = f"state{len(self.states)}"
-        pkl_path = f"state_pkls/{state_name}.pkl"
-        new_state = State(state_name, screenshot_path, pkl_path)
+        pkl_path = f"./src/persistence/state_pkls/{state_name}.pkl"
+        new_state = State(state_name, screenshot_path, pkl_path, ui1)
         self.states.append(new_state)
         new_state.save_to_pkl()
         self.save_to_pkl()
@@ -56,4 +60,4 @@ class StatesManager:
 
 
 # Primero, creamos una instancia de StatesManager
-states_manager = StatesManager("states.pkl")
+states_manager = StatesManager("./src/persistence/states.pkl")
