@@ -42,6 +42,7 @@ class SequenceRecorderController:
                 self.show_info("¡Guardado correctamente!", "La secuencia y los estados se han guardado correctamente.")
         except Exception as e:
             self.show_error("Error al abrir el cuadro de diálogo de guardar", str(e))
+            raise e
 
     def load_and_play_input_events(self):
         try:
