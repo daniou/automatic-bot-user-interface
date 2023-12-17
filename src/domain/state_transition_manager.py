@@ -5,8 +5,10 @@ from src.domain.states_manager import states_manager
 class StateTransitionManager:
     def __init__(self):
         self.state_transitions = []
+        self.load_from_csv()
 
     def add_state_transition(self, init_state_screenshot_path, actions_path, final_state_screenshot_path):
+
         state_transition = StateTransition(
             init_state_screenshot_path,
             actions_path,
@@ -21,11 +23,22 @@ class StateTransitionManager:
             writer = csv.writer(csvfile)
             writer.writerow(['Initial State', 'Actions', 'Final State'])
             for transition in self.state_transitions:
-                writer.writerow([
-                    transition.initial_state,
-                    transition.actions_paths_list,
-                    transition.final_states
-                ])
+                for action in transition.actions_paths_list:
+                    for final_state in transition.final_states:
+                        writer.writerow([
+                            transition.initial_state,
+                            action,
+                            final_state
+                        ])
+
+    def load_from_csv(self, filepath='state_transitions.csv'):
+        try:
+            with open(filepath, 'r', newline='') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    self.add_state_transition(row['Initial State'], row['Actions'], row['Final State'])
+        except FileNotFoundError:
+            print("CSV file not found. Starting with an empty list.")
 
     def __repr__(self):
         return f"<TransitionActionsManager transitions={self.state_transitions}>"
