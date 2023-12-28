@@ -66,25 +66,26 @@ class WindowManager:
             self.window.resizeTo(new_width, new_height)
 
     def window_screenshot(self, screenshot_path):
-        if self.window:
-            current_x, current_y, current_width, current_height = (
-                self.window.left,
-                self.window.top,
-                self.window.width,
-                self.window.height,
-            )
+        while not self.window:
+            self.open_and_initialize_window()
+        current_x, current_y, current_width, current_height = (
+            self.window.left,
+            self.window.top,
+            self.window.width,
+            self.window.height,
+        )
 
-            # Capturar un screenshot de la ventana
-            screenshot = pyautogui.screenshot(
-                region=(
-                    current_x + 8,
-                    current_y,
-                    current_width - 16,
-                    current_height - 8,
-                )
+        # Capturar un screenshot de la ventana
+        screenshot = pyautogui.screenshot(
+            region=(
+                current_x + 8,
+                current_y,
+                current_width - 16,
+                current_height - 8,
             )
-            screenshot.save(screenshot_path)
-            print(f"Screenshot guardado en: {screenshot_path}")
+        )
+        screenshot.save(screenshot_path)
+        print(f"Screenshot guardado en: {screenshot_path}")
         return screenshot_path
 
     def initialize_window(self):
@@ -110,10 +111,14 @@ class WindowManager:
 
     def open_application(self, executable_path, window_title=config.EXECUTABLE_WINDOW_TITLE, window_class=None):
         try:
+            # Intenta abrir la aplicación
             subprocess.Popen([executable_path])
 
-            # Esperar hasta que la ventana de la aplicación esté disponible
-            while True:
+            # Espera hasta que la ventana de la aplicación esté disponible durante un tiempo limitado
+            timeout = 30  # Puedes ajustar este valor según tus necesidades
+            start_time = time.time()
+
+            while time.time() - start_time < timeout:
                 windows = gw.getAllWindows()
                 target_window = None
                 for window in windows:
@@ -127,8 +132,13 @@ class WindowManager:
 
                 time.sleep(1)
 
-            # Activar la ventana de la aplicación
-            target_window.activate()
+            if target_window:
+                # Activar la ventana de la aplicación
+                target_window.activate()
+            else:
+                print("No se pudo encontrar la ventana de la aplicación después de esperar.")
 
         except FileNotFoundError:
             print(f"Application not found at the specified path: {executable_path}")
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")

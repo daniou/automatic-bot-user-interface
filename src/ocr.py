@@ -1,6 +1,6 @@
 import easyocr
 
-from src.domain.ui_element import UIElement
+from src.models.ui_element import UIElement
 
 # Initialize the OCR reader
 reader = easyocr.Reader(['es'])

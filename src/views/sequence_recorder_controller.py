@@ -34,7 +34,7 @@ class SequenceRecorderController:
 
                 final_state_screenshot_path = self.window_manager.window_screenshot("final_screenshot.png")
 
-                self.transition_actions_manager.add_state_transition(
+                self.transition_actions_manager.add(
                     init_state_screenshot_path,
                     result_queue.get(),
                     final_state_screenshot_path

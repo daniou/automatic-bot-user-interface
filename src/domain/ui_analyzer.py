@@ -1,5 +1,5 @@
 import easyocr
-from src.domain.ui_element import UIElement
+from src.models.ui_element import UIElement
 
 
 class UIAnalyzer:
@@ -12,25 +12,42 @@ class UIAnalyzer:
         return ui_elements
 
     @staticmethod
+    def ui_contains_text(ui, text):
+        ui_text = UIAnalyzer.get_text(ui)
+        return text in ui_text
+
+    @staticmethod
+    def get_text(ui):
+        texts = [element.text for element in ui]
+        full_text = ' '.join(texts)
+        return full_text
+
+    @staticmethod
     def find_differences(ui, other_ui):
-        differences = []
-        # Asegurarse de que ambos UI tienen la misma longitud
-        if len(ui) != len(other_ui):
-            return "UIs have different lengths"
+        # Extract text from both UIElement lists
+        ui_text = UIAnalyzer.get_text(ui)
+        other_ui_text = UIAnalyzer.get_text(other_ui)
 
-        for element1, element2 in zip(ui, other_ui):
-            if element1 != element2:
+        # Find the differences between the two texts
+        differences = set(ui_text.split()) ^ set(other_ui_text.split())
+        print(f"-------------{differences}")
 
-                differences.append((element1, element2))
-        return differences
+        return list(differences)
 
     def are_equal(self, screenshot1, screenshot2):
         ui1 = self.get_ui(screenshot1)
         ui2 = self.get_ui(screenshot2)
-        return len(UIAnalyzer.find_differences(ui1, ui2)) == 0
+
+        return self.are_uis_equal(ui1, ui2)
 
     @staticmethod
     def are_uis_equal(ui1, ui2):
-        return len(UIAnalyzer.find_differences(ui1, ui2)) == 0
+        are_equal = len(UIAnalyzer.find_differences(ui1, ui2)) == 0
+        print(f"@@@END OF PIFOUSTIOU: {are_equal} -> {ui1} == {ui2}")
+        return are_equal
+
+
+
+
 
 ui_analyzer = UIAnalyzer()
