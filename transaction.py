@@ -5,13 +5,13 @@ from queue import Queue
 
 class Transaction:
     def __init__(self, name, window_manager, state_transition_manager, target_state):
+        print("Target state------->", target_state)
         self.name = name
         self.window_manager = window_manager
         self.state_transition_manager = state_transition_manager
         self.init_state = self.get_init_state()
         self.current_state_transition = self.get_current_state_transition()
         self.target_state = target_state
-        print("Target state------->", target_state)
 
     def get_init_state(self):
         screenshot_path = self.window_manager.window_screenshot("temp_screenshot.png")
@@ -23,6 +23,7 @@ class Transaction:
 
 
     def get_target_state(self):
+        print("SE PIDE EL TARGET STATE", self.target_state)
         return self.target_state
 
     def get_current_state_transition(self):
@@ -37,7 +38,7 @@ class Transaction:
         print("Executing transaction")
 
         path = self.state_transition_manager.find_path(self.get_init_state(), self.get_target_state())
-        #self.state_transition_manager[0].execute()
+        path[0].execute()
         print(path, "cliente añadidio")
 
 
@@ -66,6 +67,7 @@ class TransactionQueue:
                 transaction.execute()
             except Exception as e:
                 print(f"Error al ejecutar la transacción: {e}")
+                raise e
             finally:
                 self.queue.task_done()
 

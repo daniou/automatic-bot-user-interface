@@ -7,6 +7,7 @@ class UIAnalyzer:
         self.reader = easyocr.Reader([language])
 
     def get_ui(self, image_path):
+        print("Image path:", image_path)
         result = self.reader.readtext(image_path)
         ui_elements = [UIElement(coords, text, confidence) for (coords, text, confidence) in result]
         return ui_elements

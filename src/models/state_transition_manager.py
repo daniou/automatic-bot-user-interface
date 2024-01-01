@@ -1,67 +1,95 @@
 import csv
 from collections import deque
 
+from src.models.states_manager import State
+
 
 class StateTransitionManager:
     def __init__(self, action_executioner, states_manager):
+        print(action_executioner, states_manager)
         self.state_transitions = []
         self.states_manager = states_manager
         self.loaded = False
-        self.load_from_csv()
         self.action_executioner = action_executioner
+        self.load_from_csv()
         self.graph = {}
 
-    def add(self, init_state_screenshot_path, actions_path, final_state_screenshot_path):
+    def add(self, init_state_path, actions_path, final_state_path):
         state_transition = StateTransition(
             self.action_executioner,
-            init_state_screenshot_path,
+            init_state_path,
             actions_path,
-            final_state_screenshot_path,
+            [final_state_path],
             self.states_manager
         )
+
         self.state_transitions.append(state_transition)
-        if self.loaded:
-            self.save_to_csv()
-        init_state = state_transition.get_init_states()
-        if init_state not in self.graph:
-            self.graph[init_state] = []
-        self.graph[init_state].append(state_transition)
-        print(self.state_transitions)
+        #self.save_to_csv() #TODO: OJO DE VERDAS SE PUEDE CQAUITAR?
+
+    def add_using_screenshots(self, init_state_screenshot_path, actions_path, final_state_screenshot_path):
+        init_state = self.states_manager.add_state_from_screenshot(init_state_screenshot_path)
+        final_state = self.states_manager.add_state_from_screenshot(final_state_screenshot_path)
+        print("Aqui",init_state_screenshot_path, final_state_screenshot_path)
+        state_transition = StateTransition(
+            self.action_executioner,
+            init_state,
+            actions_path,
+            [final_state],
+            self.states_manager
+        )
+        print("Final state---------> 0000000: ", state_transition)
+        self.state_transitions.append(state_transition)
+        self.save_to_csv()
+
+#TODO: AQUI ESTA EL PROBLEMAAAA SE COMPARA PATH CON STATE
+    def get_by_start_state(self, start_state):
+        for state_transition in self.state_transitions:
+            if start_state == state_transition.get_init_states():
+                return [state_transition]
+            print("NOOOOO SEEEE ENCUENTRTA LA TRANSICIÓN", start_state, state_transition.get_init_states())
+
+        return None
+
+    # TODO: MEJORAR ALGORITMO Y GRAFO, ACTUALMENTE SE CONTEMPLA SOLO UN ESTADO INICIAL POSIBLE
+
+    from collections import deque
 
     def find_path(self, start_state, goal_state):
-        try:
-            print("---SALSEO GRAFERO---")
-            print(start_state)
-            print(goal_state)
-            print("-------------------")
+        print("---SALSEO GRAFERO---")
+        print("Estado inicial:", start_state)
+        print("Estado objetivo:", goal_state)
+        print("-------------------")
 
-            visited = set()
-            queue = deque([(start_state, [])])
+        visited = set()
+        queue = deque([(start_state, [])])
 
-            while queue:
-                current_state, path = queue.popleft()
-                if current_state == goal_state:
-                    return path
+        while queue:
+            current_state, current_path = queue.popleft()
+            print("Estado actual:", current_state, "| Camino actual:", current_path)
 
-                print(f"HASTAA QUI3 {type(current_state)}: {current_state},\n {type(visited)}: {visited} ")
-                if current_state in visited:
-                    continue
+            if current_state == goal_state:
+                print("Estado objetivo alcanzado. Camino:", current_path)
+                return current_path
 
+            if current_state not in visited:
+                print("CURRENT STATE ES:", current_state)
                 visited.add(current_state)
+                transitions = self.get_by_start_state(current_state)##################
 
-                # Ahora, verifica las transiciones desde el estado actual
-                transitions = self.graph.get(current_state, [])
-                for transition in transitions:
-                    next_state = transition.final_states
-                    if next_state not in visited:
-                        new_path = path + [transition]
-                        queue.append((next_state, new_path))
-            return None
+                if transitions is not None:
+                    print("hay añgo al menmos:", transitions)
+                    for transition in transitions:
+                        print("Transición encontrada:", transition)
+                        for final_state in transition.get_final_states():
+                            print("Añadiendo al estado final a la cola:", final_state)
+                            queue.append((final_state, current_path + [transition]))
+                else:
+                    print("No se encontraron transiciones para el estado:", current_state)
+            else:
+                print("Estado ya visitado:", current_state)
 
-        except Exception as e:
-            # Manejar cualquier excepción no especificada
-            print(f"Error al buscar path de ejecución para transicionar de estado: {str(e)}")
-            return None
+        print("No se encontró un camino.")
+        return None
 
 
     def save_to_csv(self, filepath='state_transitions.csv'):
@@ -71,6 +99,9 @@ class StateTransitionManager:
             for transition in self.state_transitions:
                 for action in transition.actions_paths_list:
                     for final_state in transition.final_states:
+                        print("-------------", transition.initial_state,
+                            action,
+                            final_state)
                         writer.writerow([
                             transition.initial_state,
                             action,
@@ -92,22 +123,33 @@ class StateTransitionManager:
 
 
 class StateTransition:
-    def __init__(self, action_executioner, initial_state_screenshot_path, actions_path, final_state_screenshot_path,
+    def __init__(self, action_executioner, initial_state, actions_path, final_states,
                  states_manager):
+        print("ñññññññ",initial_state, actions_path, final_states)
         self.action_executioner = action_executioner
         self.states_manager = states_manager
-        self.initial_state = self.states_manager.add(initial_state_screenshot_path)
-        self.final_states = [self.states_manager.add(final_state_screenshot_path)]
+        self.initial_state = initial_state
+        for final_state in final_states:
+            final_states = self.states_manager.add_from_path(final_state)
+        self.final_states = [final_states]
+        print("ñññññññ",self.final_states)
         self.actions_paths_list = [actions_path]
 
     def add_final_state_screenshot(self, screenshot_path):
-        self.final_states.append(self.states_manager.add(screenshot_path))
+        self.final_states.append(self.states_manager.add_state_from_screenshot(screenshot_path))
 
     def get_final_states(self):
-        return self.final_states
+        states = []
+        for state_path in self.final_states:
+            state = State.load_from_pkl(state_path)
+            states.append(state)
+        print("parece que siq ue va por buen camino 9", state)
+        return states
 
     def get_init_states(self):
-        return self.initial_state
+        print("PORFAVOR FUNCIONA YA:", self.initial_state)
+        state = State.load_from_pkl(self.initial_state)
+        return state
 
     def execute(self):
         self.action_executioner.play_events("src/persistence/add_client.csv")
