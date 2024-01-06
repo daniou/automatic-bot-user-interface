@@ -151,8 +151,9 @@ class StateTransition:
         state = State.load_from_pkl(self.initial_state)
         return state
 
-    def execute(self):
-        self.action_executioner.play_events("src/persistence/add_client.csv")
+    def execute(self, ordered_params):
+        #TODO: HACER QUE EJECUTE LA SECUENCIA DE ACCIONES PROPIA DE LA TRANSICION NO HARDCODED
+        self.action_executioner.play_events(self.actions_paths_list[0], ordered_params)
 
     def __repr__(self):
         return (f"<TransitionAction initial={self.initial_state}, "

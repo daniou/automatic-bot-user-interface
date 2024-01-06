@@ -4,14 +4,14 @@ from queue import Queue
 
 
 class Transaction:
-    def __init__(self, name, window_manager, state_transition_manager, target_state):
-        print("Target state------->", target_state)
+    def __init__(self, name, window_manager, state_transition_manager, target_state, params_values):
+        print("Param values------->", params_values)
         self.name = name
         self.window_manager = window_manager
         self.state_transition_manager = state_transition_manager
         self.init_state = self.get_init_state()
-        self.current_state_transition = self.get_current_state_transition()
         self.target_state = target_state
+        self.params_values = params_values
 
     def get_init_state(self):
         screenshot_path = self.window_manager.window_screenshot("temp_screenshot.png")
@@ -21,13 +21,9 @@ class Transaction:
 
         return state
 
-
     def get_target_state(self):
         print("SE PIDE EL TARGET STATE", self.target_state)
         return self.target_state
-
-    def get_current_state_transition(self):
-        pass
 
     def execute(self):
         # Check state
@@ -38,7 +34,7 @@ class Transaction:
         print("Executing transaction")
 
         path = self.state_transition_manager.find_path(self.get_init_state(), self.get_target_state())
-        path[0].execute()
+        path[0].execute(self.params_values)
         print(path, "cliente añadidio")
 
 
