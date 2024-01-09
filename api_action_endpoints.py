@@ -25,7 +25,6 @@ def create_client():
     transaction_queue.add_transaction(create_client)
     return jsonify({"message": "Client added successfully"}), 201
 
-
 @app.route('/vehicles', methods=['POST'])
 def create_vehicle():
     data = request.get_json()

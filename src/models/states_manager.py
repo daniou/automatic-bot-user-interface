@@ -18,10 +18,14 @@ class State:
         self.ui_path = self.save_ui()
         self.id_text_in_ui = id_text_in_ui
 
+
+
     def move_and_rename_screenshot(self, screenshot_path, name):
-        new_path = f"./src/persistence/state_screenshots/{name}.png"
-        os.makedirs(os.path.dirname(new_path), exist_ok=True)
-        shutil.move(screenshot_path, new_path)
+        new_path = None
+        if screenshot_path is not None:
+            new_path = f"./src/persistence/state_screenshots/{name}.png"
+            os.makedirs(os.path.dirname(new_path), exist_ok=True)
+            shutil.move(screenshot_path, new_path)
         return new_path
 
     def __eq__(self, other):
@@ -34,9 +38,19 @@ class State:
         if not isinstance(other, State):
             return False
 
-        # Realiza la comparación entre los estados
-        # TODO: Puedes ajustar la lógica de comparación según tus necesidades
-        return self.id_text_in_ui == other.id_text_in_ui or self.pkl_path == other.pkl_path
+        if self.id_text_in_ui == other.id_text_in_ui or self.pkl_path == other.pkl_path:
+            return True
+
+        id_text = self.id_text_in_ui
+        ui = other.ui
+        if not id_text:
+            id_text = other.id_text_in_ui
+            ui = self.ui
+
+        print("SE ESTA REALIZANDO UNA COMPARACIÓN: ui:", ui, "id_text:", id_text)
+        print(self, "\n", other)
+
+        return UIAnalyzer.ui_contains_text(ui, id_text)
 
     def __hash__(self):
         return hash(self.id_text_in_ui)
@@ -85,8 +99,10 @@ class StatesManager:
     def find_if_state_already_exists(self, screenshot_path):
         print("aqui el eotro:", screenshot_path)
         ui1 = ui_analyzer.get_ui(screenshot_path)
+        temp_state = State("temp state", None, None, ui1, None)
+        #TODO: cuidado con los - en el id_text que la pueden liar
         for state in self.states:
-            if (state.id_text_in_ui != "" and (state.id_text_in_ui[0] == "-" and not UIAnalyzer.ui_contains_text(ui1, state.id_text_in_ui[1:]) or UIAnalyzer.ui_contains_text(ui1, state.id_text_in_ui)) or UIAnalyzer.are_uis_equal(ui1, state.ui)):
+            if state == temp_state:
                 return state
         return None
 
@@ -99,11 +115,9 @@ class StatesManager:
         return new_state.pkl_path
 
     def add_state_from_screenshot(self, screenshot_path):
-        print("eyooooouuuuu")
         already_existing_state = self.find_if_state_already_exists(screenshot_path)
         print("el esatdo dequ :", already_existing_state)
         if already_existing_state is not None:
-            print("yalahvitoh")
             return already_existing_state.pkl_path
         state_name = f"state{len(self.states)}"
         pkl_path = f"./src/persistence/state_pkls/{state_name}.pkl"
@@ -142,5 +156,4 @@ class StatesManager:
 
     def find_state_with_id_text(self, id_text_in_ui):
         state = [state for state in self.states if state.id_text_in_ui == id_text_in_ui][0]
-        print("MECAGONLARAZA", state)
         return state

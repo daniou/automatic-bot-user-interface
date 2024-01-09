@@ -14,8 +14,22 @@ class UIAnalyzer:
 
     @staticmethod
     def ui_contains_text(ui, text):
+        if ui is None:
+            return False
+        if text is None:
+            return True
         ui_text = UIAnalyzer.get_text(ui)
-        return text in ui_text
+        elements = text.split(',')  # Divide la cadena en elementos, funciona con o sin comas
+        for element in elements:
+            element = element.strip()  # Eliminar espacios en blanco extra
+            if element.startswith('-'):
+                if element[1:] in ui_text:
+                    return False  # El elemento que no debería estar presente se encontró
+            else:
+                if element not in ui_text:
+                    return False  # Un elemento necesario no se encontró
+        print("COINCIDEN LOS TEXT IDS CON EL TEXTO DE LAS UIS")
+        return True  # Todos los elementos necesarios están presentes y los no deseados no están
 
     @staticmethod
     def get_text(ui):

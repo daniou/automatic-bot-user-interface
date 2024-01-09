@@ -2,6 +2,8 @@ import threading
 import time
 from queue import Queue
 
+import config
+
 
 class Transaction:
     def __init__(self, name, window_manager, state_transition_manager, target_state, params_values):
@@ -9,11 +11,11 @@ class Transaction:
         self.name = name
         self.window_manager = window_manager
         self.state_transition_manager = state_transition_manager
-        self.init_state = self.get_init_state()
+        self.init_state = self.get_current_state()
         self.target_state = target_state
         self.params_values = params_values
 
-    def get_init_state(self):
+    def get_current_state(self):
         screenshot_path = self.window_manager.window_screenshot("temp_screenshot.png")
         state = self.state_transition_manager.states_manager.find_if_state_already_exists(screenshot_path)
         if state is None:
@@ -26,16 +28,28 @@ class Transaction:
         return self.target_state
 
     def execute(self):
-        # Check state
-        # Find path
-        # Execute orders
-        # Check state
-        # Get next orders
         print("Executing transaction")
-
-        path = self.state_transition_manager.find_path(self.get_init_state(), self.get_target_state())
-        path[0].execute(self.params_values)
-        print(path, "cliente añadidio")
+        retries = 0
+        init_state = self.get_current_state()
+        target_state = self.get_target_state()
+        print("{{{{{", init_state)
+        print("{{{{{", target_state)
+        while init_state != target_state:
+            path = self.state_transition_manager.find_path(init_state, target_state)
+            print("#####AUQI EL PATH:", path)
+            if path:
+                path[0].execute(self.params_values)
+                retries = 0
+            else:
+                time.sleep(3)
+                print("############################################################",retries,"NO HA ENCONTRADO PATH")
+                if retries > config.MAX_RETRY_NUMBER_FINDING_PATH:
+                    raise Exception("There wasn't a viable path of comands programmed in order to arrive to"
+                                    "the desired state")
+                retries += 1
+                print("No se ha encontrado un path")
+            init_state = self.get_current_state()
+        print("cliente añadidio")
 
 
 class TransactionQueue:
