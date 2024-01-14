@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-
 import config
 from src.domain.input_event_manager import EventPlayer
 from src.domain.window_manager import WindowManager
@@ -8,6 +7,7 @@ from src.models.states_manager import StatesManager
 from transaction import Transaction, TransactionQueue
 
 app = Flask(__name__)
+
 
 class Preprocessor:
     @staticmethod
@@ -25,10 +25,11 @@ def create_client():
     transaction_queue.add_transaction(create_client)
     return jsonify({"message": "Client added successfully"}), 201
 
+
 @app.route('/vehicles', methods=['POST'])
 def create_vehicle():
     data = request.get_json()
-    #add_vehicle(data)
+    # add_vehicle(data)
     return jsonify({"message": "Vehicle added successfully"}), 201
 
 

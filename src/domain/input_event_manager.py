@@ -76,6 +76,13 @@ class PlayerCommand:
             KeyboardTypist.type_text_in_keyboard(self.param)
         elif self.event_type == "insert":
             KeyboardTypist.type_text_in_keyboard(self.param)
+        elif self.event_type == "right_click":
+            x_str, y_str = self.param.split(",")
+            x = int(x_str)
+            y = int(y_str)
+            pyautogui.click(x,y)
+            print("AADKHASDJKAHSDKJAHDKJAS: ", x,y)
+
         else:
             raise Exception("The event in the csv cant be reproduced.")
 
@@ -117,6 +124,8 @@ class EventPlayer:
                         param = ordered_params[parameters_inserted]
                         parameters_inserted += 1
                         print("INSERT TYPE EVENT:", param)
+
+
                     command = PlayerCommand(param, event_type)
                     command.execute()
 
