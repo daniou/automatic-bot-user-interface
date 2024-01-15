@@ -135,9 +135,6 @@ class StateTransition:
         print("ñññññññ",self.final_states)
         self.actions_paths_list = [actions_path]
 
-    def add_final_state_screenshot(self, screenshot_path):
-        self.final_states.append(self.states_manager.add_state_from_screenshot(screenshot_path))
-
     def get_final_states(self):
         states = []
         for state_path in self.final_states:

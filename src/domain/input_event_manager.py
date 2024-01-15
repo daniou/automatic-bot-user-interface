@@ -80,8 +80,7 @@ class PlayerCommand:
             x_str, y_str = self.param.split(",")
             x = int(x_str)
             y = int(y_str)
-            pyautogui.click(x,y)
-            print("AADKHASDJKAHSDKJAHDKJAS: ", x,y)
+            pyautogui.click(x, y)
 
         else:
             raise Exception("The event in the csv cant be reproduced.")

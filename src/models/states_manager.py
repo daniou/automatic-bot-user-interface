@@ -18,8 +18,6 @@ class State:
         self.ui_path = self.save_ui()
         self.id_text_in_ui = id_text_in_ui
 
-
-
     def move_and_rename_screenshot(self, screenshot_path, name):
         new_path = None
         if screenshot_path is not None:
@@ -30,12 +28,16 @@ class State:
 
     def __eq__(self, other):
         # Si other es una cadena de texto, intenta cargar el estado desde un archivo .pkl
-
+        print(f"Comparacion entre {self.id_text_in_ui} | {other.id_text_in_ui}")
         if isinstance(other, str):
             other = State.load_from_pkl(other)
 
         # Si other no es una instancia de State después de intentar cargar desde .pkl, retorna False
         if not isinstance(other, State):
+            return False
+
+        if (self.id_text_in_ui is None and other.id_text_in_ui is None) or (self.id_text_in_ui == "" and other.id_text_in_ui == "")\
+                or (self.id_text_in_ui is None and other.id_text_in_ui == "") or (other.id_text_in_ui is None and self.id_text_in_ui == "")  :
             return False
 
         if self.id_text_in_ui == other.id_text_in_ui or self.pkl_path == other.pkl_path:

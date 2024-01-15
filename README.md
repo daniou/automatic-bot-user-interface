@@ -54,3 +54,11 @@ Si encuentras algún problema o tienes alguna pregunta, por favor abre un issue 
 
 ## Licencia 📜
 Este proyecto está bajo la Licencia XYZ. Consulta el archivo `LICENSE` para más detalles.
+
+
+## COMO USAR
+Ejecutar main para grabarse haciendo las macros
+TODO: PARECE QUE EL PROBLEMA DE QUE NO SE GUARDA LA ULTIMA SCREENSHOT ES PORQUE NO SE CREA EL ESTADO
+Y ES PROBABLE QUE NO SE CREE EL ESTADO POR QUE EL OPERADOR DE COMPARACION ENTRE ESTADOS (O UIS)
+NO ESTE FUNCIONANDO CORRECTAMENTE. Cuando llegue peticion desde api si que debe ser laxo.
+pero mientars se está grabando, se debería guardar de manera más laxa. 
