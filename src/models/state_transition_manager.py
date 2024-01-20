@@ -125,14 +125,12 @@ class StateTransitionManager:
 class StateTransition:
     def __init__(self, action_executioner, initial_state, actions_path, final_states,
                  states_manager):
-        print("ñññññññ",initial_state, actions_path, final_states)
         self.action_executioner = action_executioner
         self.states_manager = states_manager
         self.initial_state = initial_state
         for final_state in final_states:
             final_states = self.states_manager.add_from_path(final_state)
         self.final_states = [final_states]
-        print("ñññññññ",self.final_states)
         self.actions_paths_list = [actions_path]
 
     def get_final_states(self):
@@ -149,6 +147,7 @@ class StateTransition:
         return state
 
     def execute(self, ordered_params):
+        print("LLEGA AL EXECUTE PRIMERO")
         #TODO: HACER QUE EJECUTE LA SECUENCIA DE ACCIONES PROPIA DE LA TRANSICION NO HARDCODED
         self.action_executioner.play_events(self.actions_paths_list[0], ordered_params)
 

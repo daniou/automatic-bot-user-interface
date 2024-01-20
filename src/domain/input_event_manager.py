@@ -70,11 +70,14 @@ class PlayerCommand:
         self.event_type = event_type
 
     def execute(self):
+        print("HA ENTRADO A EXECUTE")
         if self.event_type == 'down':
+            print("HA ENTRADO A DOWN")
             keyboard.press_and_release(self.param)
         elif self.event_type == 'write':
             KeyboardTypist.type_text_in_keyboard(self.param)
         elif self.event_type == "insert":
+            print("HA ENTRADO A INSERT")
             KeyboardTypist.type_text_in_keyboard(self.param)
         elif self.event_type == "right_click":
             x_str, y_str = self.param.split(",")

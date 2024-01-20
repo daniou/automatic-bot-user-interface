@@ -27,6 +27,8 @@ class State:
         return new_path
 
     def __eq__(self, other):
+        if self is None or other is None:
+            return False
         # Si other es una cadena de texto, intenta cargar el estado desde un archivo .pkl
         print(f"Comparacion entre {self.id_text_in_ui} | {other.id_text_in_ui}")
         if isinstance(other, str):
@@ -157,5 +159,9 @@ class StatesManager:
                 self.states.append(state)
 
     def find_state_with_id_text(self, id_text_in_ui):
-        state = [state for state in self.states if state.id_text_in_ui == id_text_in_ui][0]
-        return state
+        try:
+            state = [state for state in self.states if state.id_text_in_ui == id_text_in_ui][0]
+            return state
+        except:
+            print("Recuerda asignar a cada estado su text id")
+            raise
