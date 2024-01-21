@@ -9,8 +9,6 @@ from src.models.ui_element import UIElement  # Asegúrate de importar correctame
 
 class State:
     def __init__(self, name, screenshot_path, pkl_path, ui, id_text_in_ui=None):
-        print("@@@@@@polisia")
-        print(name, screenshot_path, pkl_path, ui, id_text_in_ui)
         self.name = name
         self.screenshot_path = self.move_and_rename_screenshot(screenshot_path, name)
         self.pkl_path = pkl_path
@@ -101,7 +99,6 @@ class StatesManager:
         self.load_from_csv()
 
     def find_if_state_already_exists(self, screenshot_path):
-        print("aqui el eotro:", screenshot_path)
         ui1 = ui_analyzer.get_ui(screenshot_path)
         temp_state = State("temp state", None, None, ui1, None)
         #TODO: cuidado con los - en el id_text que la pueden liar
@@ -120,7 +117,6 @@ class StatesManager:
 
     def add_state_from_screenshot(self, screenshot_path):
         already_existing_state = self.find_if_state_already_exists(screenshot_path)
-        print("el esatdo dequ :", already_existing_state)
         if already_existing_state is not None:
             return already_existing_state.pkl_path
         state_name = f"state{len(self.states)}"

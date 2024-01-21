@@ -29,7 +29,6 @@ class StateTransitionManager:
     def add_using_screenshots(self, init_state_screenshot_path, actions_path, final_state_screenshot_path):
         init_state = self.states_manager.add_state_from_screenshot(init_state_screenshot_path)
         final_state = self.states_manager.add_state_from_screenshot(final_state_screenshot_path)
-        print("Aqui",init_state_screenshot_path, final_state_screenshot_path)
         state_transition = StateTransition(
             self.action_executioner,
             init_state,
@@ -37,7 +36,6 @@ class StateTransitionManager:
             [final_state],
             self.states_manager
         )
-        print("Final state---------> 0000000: ", state_transition)
         self.state_transitions.append(state_transition)
         self.save_to_csv()
 
@@ -46,7 +44,6 @@ class StateTransitionManager:
         for state_transition in self.state_transitions:
             if start_state == state_transition.get_init_states():
                 return [state_transition]
-            print("NOOOOO SEEEE ENCUENTRTA LA TRANSICIÓN", start_state, state_transition.get_init_states())
 
         return None
 
@@ -55,7 +52,7 @@ class StateTransitionManager:
     from collections import deque
 
     def find_path(self, start_state, goal_state):
-        print("---SALSEO GRAFERO---")
+        print("---Búsqueda en grafo de estados---")
         print("Estado inicial:", start_state)
         print("Estado objetivo:", goal_state)
         print("-------------------")
@@ -72,12 +69,10 @@ class StateTransitionManager:
                 return current_path
 
             if current_state not in visited:
-                print("CURRENT STATE ES:", current_state)
                 visited.add(current_state)
                 transitions = self.get_by_start_state(current_state)##################
 
                 if transitions is not None:
-                    print("hay añgo al menmos:", transitions)
                     for transition in transitions:
                         print("Transición encontrada:", transition)
                         for final_state in transition.get_final_states():
@@ -138,16 +133,13 @@ class StateTransition:
         for state_path in self.final_states:
             state = State.load_from_pkl(state_path)
             states.append(state)
-        print("parece que siq ue va por buen camino 9", state)
         return states
 
     def get_init_states(self):
-        print("PORFAVOR FUNCIONA YA:", self.initial_state)
         state = State.load_from_pkl(self.initial_state)
         return state
 
     def execute(self, ordered_params):
-        print("LLEGA AL EXECUTE PRIMERO")
         #TODO: HACER QUE EJECUTE LA SECUENCIA DE ACCIONES PROPIA DE LA TRANSICION NO HARDCODED
         self.action_executioner.play_events(self.actions_paths_list[0], ordered_params)
 

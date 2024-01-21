@@ -58,7 +58,6 @@ class UIAnalyzer:
     @staticmethod
     def are_uis_equal(ui1, ui2):
         are_equal = len(UIAnalyzer.find_differences(ui1, ui2)) == 0
-        print(f"@@@END OF PIFOUSTIOU: {are_equal} -> {ui1} == {ui2}")
         return are_equal
 
 
