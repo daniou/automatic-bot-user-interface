@@ -25,7 +25,6 @@ class Transaction:
         return state
 
     def get_target_state(self):
-        print("SE PIDE EL TARGET STATE", self.target_state)
         return self.target_state
 
     def execute(self):

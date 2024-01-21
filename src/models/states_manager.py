@@ -49,7 +49,6 @@ class State:
             id_text = other.id_text_in_ui
             ui = self.ui
 
-        print("SE ESTA REALIZANDO UNA COMPARACIÓN: ui:", ui, "id_text:", id_text)
         print(self, "\n", other)
 
         return UIAnalyzer.ui_contains_text(ui, id_text)
