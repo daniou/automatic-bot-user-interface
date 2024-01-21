@@ -92,7 +92,7 @@ class StateTransitionManager:
         return None
 
 
-    def save_to_csv(self, filepath='state_transitions.csv'):
+    def save_to_csv(self, filepath='src/persistence/state_transitions.csv'):
         with open(filepath, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['Initial State', 'Actions', 'Final State'])
@@ -108,7 +108,7 @@ class StateTransitionManager:
                             final_state
                         ])
 
-    def load_from_csv(self, filepath='state_transitions.csv'):
+    def load_from_csv(self, filepath='src/persistence/state_transitions.csv'):
         try:
             with open(filepath, 'r', newline='') as csvfile:
                 reader = csv.DictReader(csvfile)
