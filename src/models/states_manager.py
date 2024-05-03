@@ -28,7 +28,6 @@ class State:
         if self is None or other is None:
             return False
         # Si other es una cadena de texto, intenta cargar el estado desde un archivo .pkl
-        print(f"Comparacion entre {self.id_text_in_ui} | {other.id_text_in_ui}")
         if isinstance(other, str):
             other = State.load_from_pkl(other)
 
@@ -36,8 +35,10 @@ class State:
         if not isinstance(other, State):
             return False
 
-        if (self.id_text_in_ui is None and other.id_text_in_ui is None) or (self.id_text_in_ui == "" and other.id_text_in_ui == "")\
-                or (self.id_text_in_ui is None and other.id_text_in_ui == "") or (other.id_text_in_ui is None and self.id_text_in_ui == "")  :
+        if (self.id_text_in_ui is None and other.id_text_in_ui is None) or (
+                self.id_text_in_ui == "" and other.id_text_in_ui == "") \
+                or (self.id_text_in_ui is None and other.id_text_in_ui == "") or (
+                other.id_text_in_ui is None and self.id_text_in_ui == ""):
             return False
 
         if self.id_text_in_ui == other.id_text_in_ui or self.pkl_path == other.pkl_path:
@@ -51,7 +52,21 @@ class State:
 
         print(self, "\n", other)
 
-        return UIAnalyzer.ui_contains_text(ui, id_text)
+        required_texts = State.get_id_must_have_texts(id_text)
+        prohibited_texts = State.get_id_must_not_have_texts(id_text)
+
+        print(f"Comparacion entre {self.id_text_in_ui} | {other.id_text_in_ui}")
+        print("Required texts: ", required_texts)
+        print("Prohibited texts: ", prohibited_texts)
+        for text in required_texts:
+            if not UIAnalyzer.ui_contains_text(ui, text):
+                print("required texts are missing", text)
+                return False  # Required texts are missing
+        for text in prohibited_texts:
+            if UIAnalyzer.ui_contains_text(ui, text[1:]):
+                print("prohibited text found: ", text[1:])
+                return False  # Prohibited text found
+        return True  # All cases were successfully fulfilled
 
     def __hash__(self):
         return hash(self.id_text_in_ui)
@@ -79,6 +94,20 @@ class State:
             pickle.dump(self, pklfile)
             return self.pkl_path
 
+    def get_id_must_have_texts(self):
+        return [text for text in self.id_text_in_ui.split("|") if not text.startswith("-")]
+
+    def get_id_must_not_have_texts(self):
+        return [text for text in self.id_text_in_ui.split("|") if text.startswith("-")]
+
+    @staticmethod
+    def get_id_must_have_texts(id):
+        return [text for text in id.split("|") if not text.startswith("-")]
+
+    @staticmethod
+    def get_id_must_not_have_texts(id):
+        return [text for text in id.split("|") if text.startswith("-")]
+
     @staticmethod
     def load_from_pkl(pkl_path):
         print("·····", pkl_path)
@@ -100,7 +129,7 @@ class StatesManager:
     def find_if_state_already_exists(self, screenshot_path):
         ui1 = ui_analyzer.get_ui(screenshot_path)
         temp_state = State("temp state", None, None, ui1, None)
-        #TODO: cuidado con los - en el id_text que la pueden liar
+        # TODO: cuidado con los - en el id_text que la pueden liar
         for state in self.states:
             if state == temp_state:
                 return state
@@ -155,8 +184,15 @@ class StatesManager:
 
     def find_state_with_id_text(self, id_text_in_ui):
         try:
-            state = [state for state in self.states if state.id_text_in_ui == id_text_in_ui][0]
-            return state
-        except:
-            print("Recuerda asignar a cada estado su text id")
+            print("ID Text in UI:", id_text_in_ui)
+            for state in self.states:
+                print("Comparing with State ID Text:", state.id_text_in_ui)
+                if state.id_text_in_ui == id_text_in_ui:
+                    print("Found matching state.", state.id_text_in_ui)
+                    return state
+            print("No matching state found.")
+            print("ERROR: Recuerda asignar a cada estado su text id")
+            raise ValueError("No se encontró ningún estado con el ID de texto proporcionado.")
+        except Exception as e:
+            print("ERROR:", e)
             raise

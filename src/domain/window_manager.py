@@ -3,6 +3,7 @@ import pyautogui
 import subprocess
 import time
 import config
+import os
 
 pyautogui.FAILSAFE = True
 
@@ -13,8 +14,12 @@ class WindowManager:
         self.window = None
         self.default_x = 0
         self.default_y = 0
-        self.default_width = 800
-        self.default_height = 600
+        self.default_width = 2000
+        self.default_height = 900
+
+    def restart_window(self):
+        self.close_application()
+        self.open_and_initialize_window()
 
     def is_in_default_coords_and_shape(self):
         if not self.window:
@@ -41,8 +46,6 @@ class WindowManager:
             print(f"No se encontró la ventana con el título '{self.window_title}'")
             return None
 
-
-
     def activate_and_restore_window(self):
         if self.window:
             # Asegurarse de que la ventana no esté minimizada
@@ -60,10 +63,12 @@ class WindowManager:
     def move_and_scale_window(self, new_x, new_y, new_width, new_height):
         if self.window:
             # Mover la ventana a la nueva posición
+            print("aqui esta el problema",self.window)
+            self.window.activate()
             self.window.moveTo(new_x, new_y)
 
             # Cambiar el tamaño de la ventana a las nuevas dimensiones
-            self.window.resizeTo(new_width, new_height)
+            #self.window.resizeTo(new_width, new_height)
 
     def window_screenshot(self, screenshot_path):
         while not self.window:
@@ -99,20 +104,41 @@ class WindowManager:
 
         self.move_and_scale_window(new_x, new_y, new_width, new_height)
         return True
+    
+
 
     def open_and_initialize_window(self):
         self.open_application(self.executable_path)
         # Esperar un tiempo para que la ventana se abra completamente
-        time.sleep(2)
-        print("se ha abierto")
+        time.sleep(1)
+        print("Se ha abierto la interfaz python")
         self.window_title = gw.getActiveWindow().title
         self.window = self.find_window()
         return self.initialize_window()
+    
+    def close_application(self):
+        if self.window is not None:
+            self.window.close()
+        else:
+            print("No se ha encontrado ninguna ")
 
     def open_application(self, executable_path, window_title=config.EXECUTABLE_WINDOW_TITLE, window_class=None):
         try:
             # Intenta abrir la aplicación
-            subprocess.Popen([executable_path])
+            #subprocess.Popen(["start", executable_path], shell=True)
+            #TODO: MOVER ESTO A UN CSV
+            pyautogui.hotkey('winleft', 'd')
+            time.sleep(1)
+            pyautogui.doubleClick(1873, 42)
+            time.sleep(3)
+            pyautogui.write("SUPERVISOR")
+            pyautogui.press('tab')
+            pyautogui.write("4169")
+            pyautogui.press('tab')
+            pyautogui.press('enter')
+            time.sleep(1)
+            pyautogui.press('enter')
+            #os.system(f"start {executable_path}")
 
             # Espera hasta que la ventana de la aplicación esté disponible durante un tiempo limitado
             timeout = 30  # Puedes ajustar este valor según tus necesidades
@@ -120,6 +146,8 @@ class WindowManager:
 
             while time.time() - start_time < timeout:
                 windows = gw.getAllWindows()
+                wtitles = gw.getAllTitles()
+                print(wtitles)
                 target_window = None
                 for window in windows:
                     if (window_title and window.title.startswith(window_title)) or \
@@ -129,8 +157,6 @@ class WindowManager:
 
                 if target_window:
                     break
-
-                time.sleep(1)
 
             if target_window:
                 # Activar la ventana de la aplicación

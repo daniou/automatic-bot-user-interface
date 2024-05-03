@@ -18,17 +18,18 @@ class UIAnalyzer:
             return False
         if text is None:
             return True
-        ui_text = UIAnalyzer.get_text(ui)
+
+        ui_text = UIAnalyzer.get_text(ui).lower()  # Convertir texto de la interfaz a minúsculas
+
+        print("Texto en la interfaz: [[[[", ui_text, "]]]")
+
         elements = text.split(',')  # Divide la cadena en elementos, funciona con o sin comas
+
         for element in elements:
-            element = element.strip()  # Eliminar espacios en blanco extra
-            if element.startswith('-'):
-                if element[1:] in ui_text:
-                    return False  # El elemento que no debería estar presente se encontró
-            else:
-                if element not in ui_text:
-                    return False  # Un elemento necesario no se encontró
-        print("COINCIDEN LOS TEXT IDS CON EL TEXTO DE LAS UIS")
+            element = element.strip().lower()  # Eliminar espacios en blanco extra y convertir a minúsculas
+            if element not in ui_text:
+                return False  # Un elemento necesario no se encontró
+        print("Coinciden los textos con el texto de las UIs")
         return True  # Todos los elementos necesarios están presentes y los no deseados no están
 
     @staticmethod

@@ -14,13 +14,14 @@ class StateTransitionManager:
         self.load_from_csv()
         self.graph = {}
 
-    def add(self, init_state_path, actions_path, final_state_path):
+    def add(self, init_state_path, actions_path, final_state_path, name):
         state_transition = StateTransition(
             self.action_executioner,
             init_state_path,
             actions_path,
             [final_state_path],
-            self.states_manager
+            self.states_manager,
+            name=name
         )
 
         self.state_transitions.append(state_transition)
@@ -50,6 +51,12 @@ class StateTransitionManager:
     # TODO: MEJORAR ALGORITMO Y GRAFO, ACTUALMENTE SE CONTEMPLA SOLO UN ESTADO INICIAL POSIBLE
 
     from collections import deque
+
+    def get_fixed_path(self, transaction_name):
+        for transition in self.state_transitions:
+            if transition.name == transaction_name:
+                return transition
+
 
     def find_path(self, start_state, goal_state):
         print("---Búsqueda en grafo de estados---")
@@ -108,7 +115,7 @@ class StateTransitionManager:
             with open(filepath, 'r', newline='') as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
-                    self.add(row['Initial State'], row['Actions'], row['Final State'])
+                    self.add(row['Initial State'], row['Actions'], row['Final State'], row['Name'])
                 self.loaded = True
         except FileNotFoundError:
             print("CSV file not found. Starting with an empty list.")
@@ -119,7 +126,7 @@ class StateTransitionManager:
 
 class StateTransition:
     def __init__(self, action_executioner, initial_state, actions_path, final_states,
-                 states_manager):
+                 states_manager, name=""):
         self.action_executioner = action_executioner
         self.states_manager = states_manager
         self.initial_state = initial_state
@@ -127,6 +134,7 @@ class StateTransition:
             final_states = self.states_manager.add_from_path(final_state)
         self.final_states = [final_states]
         self.actions_paths_list = [actions_path]
+        self.name = name
 
     def get_final_states(self):
         states = []

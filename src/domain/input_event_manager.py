@@ -4,7 +4,7 @@ import time
 import keyboard
 import pyautogui
 
-from config import WAIT_BETWEEN_INPUT_INERACTIONS_PERIOD
+import config 
 
 
 class EventRecorder:
@@ -81,13 +81,16 @@ class PlayerCommand:
             x = int(x_str)
             y = int(y_str)
             pyautogui.click(x, y)
+        elif self.event_type == "hotkey":
+            special_key, key = self.param.split("+")
+            pyautogui.hotkey(special_key, key)
 
         else:
             raise Exception("The event in the csv cant be reproduced.")
 
 
 class EventPlayer:
-    def __init__(self, wait_interval=WAIT_BETWEEN_INPUT_INERACTIONS_PERIOD):
+    def __init__(self, wait_interval=config.WAIT_BETWEEN_INPUT_INERACTIONS_PERIOD):
         if wait_interval <= 0:
             self.play_speed = 1.0  # Default or maximum speed
         else:
@@ -106,7 +109,7 @@ class EventPlayer:
                     event_type, csv_param, _, duration = row
 
                     try:
-                        print("Aqui la duracion:", duration)
+                        #print("Aqui la duracion:", duration)
                         if duration:
                             duration = float(duration)
                         else:
@@ -119,10 +122,10 @@ class EventPlayer:
                         time.sleep(duration / self.play_speed)  # Wait until the specified timestamp
                     param = csv_param
                     if event_type == "insert":
-                        print("ENTERED INSEERT EVENT;: ",ordered_params)
+                        #print("ENTERED INSEERT EVENT;: ",ordered_params)
                         param = ordered_params[parameters_inserted]
                         parameters_inserted += 1
-                        print("INSERT TYPE EVENT:", param)
+                        #print("INSERT TYPE EVENT:", param)
 
 
                     command = PlayerCommand(param, event_type)
@@ -137,5 +140,5 @@ class EventPlayer:
 
 class KeyboardTypist:
     @staticmethod
-    def type_text_in_keyboard(text, wait_interval=WAIT_BETWEEN_INPUT_INERACTIONS_PERIOD):
+    def type_text_in_keyboard(text, wait_interval=config.WAIT_BETWEEN_INPUT_INERACTIONS_PERIOD):
         pyautogui.typewrite(text, interval=wait_interval)

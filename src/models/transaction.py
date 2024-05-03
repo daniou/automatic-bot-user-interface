@@ -3,19 +3,20 @@ import time
 from queue import Queue
 import os
 import csv
-import pickle
+import requests
 import datetime
 import config
 
 class Transaction:
-    def __init__(self, name, window_manager, state_transition_manager, target_state, params_values):
+    def __init__(self, name, window_manager, state_transition_manager, target_state, params_values, request):
         print("Param values------->", params_values)
         self.name = name
         self.window_manager = window_manager
         self.state_transition_manager = state_transition_manager
-        self.init_state = self.get_current_state()
+        self.init_state = None
         self.target_state = target_state
         self.params_values = params_values
+        self.request = request
 
     def get_current_state(self):
         screenshot_path = self.window_manager.window_screenshot("temp_screenshot.png")
@@ -29,26 +30,59 @@ class Transaction:
 
     def execute(self):
         print("Executing transaction")
+        #kill and restart program
+        self.window_manager.restart_window()
         retries = 0
-        init_state = self.get_current_state()
+        self.init_state = None
+        init_state = None
         target_state = self.get_target_state()
         while init_state != target_state:
             try:
-                path = self.state_transition_manager.find_path(init_state, target_state)
-                if path:
-                    path[0].execute(self.params_values)
-                    retries = 0
-                else:
-                    time.sleep(3)
-                    if retries > config.MAX_RETRY_NUMBER_FINDING_PATH:
+                if retries > config.MAX_RETRY_NUMBER_FINDING_PATH:
+                    print("·····llega al retries mas de los que debe")
+                    if not self.handle_error():
                         self.log_failure_details()
-                        break
+                    break
+                #path = self.state_transition_manager.find_path(init_state, target_state)
+                path = self.state_transition_manager.get_fixed_path(self.name)
+                if path:
+                    path.execute(self.params_values) 
                     retries += 1
+                    if(config.MAX_RETRY_NUMBER_FINDING_PATH > 0):
+                        time.sleep(1)
+                        
                 init_state = self.get_current_state()
             except Exception as e:
                 self.log_failure_details()
                 raise e
         print("Transacción completada")
+        #self.window_manager.close_application()
+
+    def handle_error(self):
+        print("~~~~~~~~~~entra al handle error")
+        if self.name == "add_client":
+            url = "http://127.0.0.1:5000/edit_client"  # Reemplaza esto con la URL a la que deseas hacer la llamada POST
+            data = self.request
+            headers = {
+                "Content-Type": "application/json",  
+                "Authorization": "Bearer tu_token"  
+            }
+
+            print("@@@@@@@@@@", url)
+            print("@@@@@@@@@@", data)
+            
+            try:
+                response = requests.post(url, json=data, headers=headers)
+                response.raise_for_status()
+                # Aquí puedes manejar la respuesta, por ejemplo, imprimiéndola:
+                print(response.json())
+            except requests.exceptions.RequestException as e:
+                # Aquí manejas los errores de la solicitud, por ejemplo, imprimiendo el error
+                print(e)
+
+            return True
+        return False
+
 
 
     def log_failure_details(self):
@@ -100,4 +134,4 @@ class TransactionQueue:
         """
         while True:
             self.consume_transaction()
-            time.sleep(2)
+            time.sleep(0.5)
