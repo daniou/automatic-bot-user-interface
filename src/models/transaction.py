@@ -64,13 +64,34 @@ class Transaction:
             url = "http://127.0.0.1:5000/edit_client"  # Reemplaza esto con la URL a la que deseas hacer la llamada POST
             data = self.request
             headers = {
-                "Content-Type": "application/json",  
-                "Authorization": "Bearer tu_token"  
+                "Content-Type": "application/json",
+                "Authorization": "Bearer tu_token"
             }
 
             print("@@@@@@@@@@", url)
             print("@@@@@@@@@@", data)
-            
+
+            try:
+                response = requests.post(url, json=data, headers=headers)
+                response.raise_for_status()
+                # Aquí puedes manejar la respuesta, por ejemplo, imprimiéndola:
+                print(response.json())
+            except requests.exceptions.RequestException as e:
+                # Aquí manejas los errores de la solicitud, por ejemplo, imprimiendo el error
+                print(e)
+
+            return True
+        if self.name == "add_vehicle":
+            url = "http://127.0.0.1:5000/edit_vehicle"  # Reemplaza esto con la URL a la que deseas hacer la llamada POST
+            data = self.request
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer tu_token"
+            }
+
+            print("@@@@@@@@@@", url)
+            print("@@@@@@@@@@", data)
+
             try:
                 response = requests.post(url, json=data, headers=headers)
                 response.raise_for_status()

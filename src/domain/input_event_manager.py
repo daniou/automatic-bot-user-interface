@@ -84,6 +84,9 @@ class PlayerCommand:
         elif self.event_type == "hotkey":
             special_key, key = self.param.split("+")
             pyautogui.hotkey(special_key, key)
+        elif self.event_type == "wait":
+            print("eeeeeeeeeperaaaaa")
+            time.sleep(int(self.param))
 
         else:
             raise Exception("The event in the csv cant be reproduced.")

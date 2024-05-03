@@ -97,7 +97,7 @@ class StateTransitionManager:
     def save_to_csv(self, filepath='src/persistence/state_transitions.csv'):
         with open(filepath, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(['Initial State', 'Actions', 'Final State'])
+            writer.writerow(['Initial State', 'Actions', 'Final State', 'Name'])
             for transition in self.state_transitions:
                 for action in transition.actions_paths_list:
                     for final_state in transition.final_states:

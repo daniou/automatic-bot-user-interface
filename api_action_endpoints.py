@@ -49,8 +49,8 @@ def edit_client():
     params_values = Preprocessor.get_params_values_in_insertion_order(data)
     params_values = [params_values[len(params_values)-1]] + params_values
     target_state = states_manager.find_state_with_id_text(config.added_client_id_text_in_ui)
-    create_client = Transaction("edit_client", window_manager, state_transition_manager, target_state, params_values, data)
-    transaction_queue.add_transaction(create_client)
+    edit_client = Transaction("edit_client", window_manager, state_transition_manager, target_state, params_values, data)
+    transaction_queue.add_transaction(edit_client)
     return jsonify({"message": "Client edited successfully"}), 201
 
 
@@ -60,25 +60,18 @@ def create_vehicle():
     params_values = Preprocessor.get_params_values_in_insertion_order(data)
     target_state = states_manager.find_state_with_id_text(config.added_vehicle_id_text_in_ui)
     print("Target state", target_state)
-    create_client = Transaction("add_vehicle", window_manager, state_transition_manager, target_state, params_values, data)
-    transaction_queue.add_transaction(create_client)
+    create_vehicle = Transaction("edit_vehicle", window_manager, state_transition_manager, target_state, params_values, data)
+    transaction_queue.add_transaction(create_vehicle)
     return jsonify({"message": "Vehicle added successfully"}), 201
 
-
-@app.route('/clients/<int:client_id>', methods=['PUT'])
-def update_client(client_id):
-    return jsonify({"message": "Client added successfully"}), 201
+@app.route('/edit_vehicle', methods=['POST'])
+def edit_vehicle():
     data = request.get_json()
-    result, status_code = edit_client(client_id, data)
-    return jsonify(result), status_code
-
-
-@app.route('/vehicles/<int:vehicle_id>', methods=['PUT'])
-def update_vehicle(vehicle_id):
-    return jsonify({"message": "Client added successfully"}), 201
-    data = request.get_json()
-    result, status_code = edit_vehicle(vehicle_id, data)
-    return jsonify(result), status_code
+    params_values = Preprocessor.get_params_values_in_insertion_order(data)
+    target_state = states_manager.find_state_with_id_text(config.added_client_id_text_in_ui)
+    edit_vehicle = Transaction("edit_vehicle", window_manager, state_transition_manager, target_state, params_values, data)
+    transaction_queue.add_transaction(edit_vehicle)
+    return jsonify({"message": "Vehicle edited successfully"}), 201
 
 
 player = EventPlayer()
