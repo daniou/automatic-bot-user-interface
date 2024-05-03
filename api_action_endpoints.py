@@ -60,7 +60,7 @@ def create_vehicle():
     params_values = Preprocessor.get_params_values_in_insertion_order(data)
     target_state = states_manager.find_state_with_id_text(config.added_vehicle_id_text_in_ui)
     print("Target state", target_state)
-    create_vehicle = Transaction("edit_vehicle", window_manager, state_transition_manager, target_state, params_values, data)
+    create_vehicle = Transaction("add_vehicle", window_manager, state_transition_manager, target_state, params_values, data)
     transaction_queue.add_transaction(create_vehicle)
     return jsonify({"message": "Vehicle added successfully"}), 201
 
