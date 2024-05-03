@@ -7,7 +7,8 @@ MAX_RETRY_NUMBER_FINDING_PATH = 0
 
 
 
-#ADD CLIENT
+#final states text ids
 added_client_id_text_in_ui = "Datos cliente|-NIF no valido|-NIF ya existe"
 edited_client_id_text_in_ui = "Datos cliente|-NIF no valido|-NIF ya existe"
+added_vehicle_id_text_in_ui = "Datos|-de bastidor no valido.|-no valida."
 
