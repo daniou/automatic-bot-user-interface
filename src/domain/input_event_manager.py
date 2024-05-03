@@ -4,7 +4,7 @@ import time
 import keyboard
 import pyautogui
 
-from config import WAIT_BETWEEN_INPUT_INERACTIONS_PERIOD
+import config 
 
 
 class EventRecorder:
@@ -30,7 +30,6 @@ class EventRecorder:
 
         except Exception as e:
             raise e
-
 
 
 class EventStrategy(ABC):
@@ -66,20 +65,42 @@ class DefaultEventStrategy(EventStrategy):
 
 
 class PlayerCommand:
-    def __init__(self, key_name, event_type):
-        self.key_name = key_name
+    def __init__(self, param, event_type):
+        self.param = param
         self.event_type = event_type
 
     def execute(self):
         if self.event_type == 'down':
-            keyboard.press_and_release(self.key_name)
+            keyboard.press_and_release(self.param)
+        elif self.event_type == 'write':
+            KeyboardTypist.type_text_in_keyboard(self.param)
+        elif self.event_type == "insert":
+            KeyboardTypist.type_text_in_keyboard(self.param)
+        elif self.event_type == "right_click":
+            x_str, y_str = self.param.split(",")
+            x = int(x_str)
+            y = int(y_str)
+            pyautogui.click(x, y)
+        elif self.event_type == "hotkey":
+            special_key, key = self.param.split("+")
+            pyautogui.hotkey(special_key, key)
+        elif self.event_type == "wait":
+            print("eeeeeeeeeperaaaaa")
+            time.sleep(int(self.param))
+
+        else:
+            raise Exception("The event in the csv cant be reproduced.")
 
 
 class EventPlayer:
-    def __init__(self, play_speed=1.0/WAIT_BETWEEN_INPUT_INERACTIONS_PERIOD):
-        self.play_speed = play_speed
+    def __init__(self, wait_interval=config.WAIT_BETWEEN_INPUT_INERACTIONS_PERIOD):
+        if wait_interval <= 0:
+            self.play_speed = 1.0  # Default or maximum speed
+        else:
+            self.play_speed = 1.0 / wait_interval  # Calculated play speed based on the interval
 
-    def play_events(self, csv_file):
+    def play_events(self, csv_file, ordered_params=None):
+        parameters_inserted = 0
         try:
             with open(csv_file, newline='') as csvfile:
                 reader = csv.reader(csvfile, delimiter=',')
@@ -88,27 +109,39 @@ class EventPlayer:
                         raise ValueError(
                             f"Invalid CSV format at row {row_number}. Each row should have 4 columns. Row content: {row}")
 
-                    event_type, key_name, _, duration = row
+                    event_type, csv_param, _, duration = row
 
                     try:
-                        duration = float(duration)
+                        #print("Aqui la duracion:", duration)
+                        if duration:
+                            duration = float(duration)
+                        else:
+                            duration = 0
                     except ValueError as e:
-                        raise ValueError(f"Error parsing timestamp in row {row_number}: {row}") from e
+                        print(f"Warning: Invalid duration format in row {row_number}, setting duration to 0.")
+                        duration = 0
 
                     if self.play_speed > 0:
                         time.sleep(duration / self.play_speed)  # Wait until the specified timestamp
+                    param = csv_param
+                    if event_type == "insert":
+                        #print("ENTERED INSEERT EVENT;: ",ordered_params)
+                        param = ordered_params[parameters_inserted]
+                        parameters_inserted += 1
+                        #print("INSERT TYPE EVENT:", param)
 
-                    command = PlayerCommand(key_name, event_type)
+
+                    command = PlayerCommand(param, event_type)
                     command.execute()
 
         except FileNotFoundError as e:
             print(f"Error: File '{csv_file}' not found.")
         except Exception as e:
             print(f"An error occurred: {e}")
+            raise e
 
 
 class KeyboardTypist:
-    def type_text_in_keyboard(self, text, wait_interval=WAIT_BETWEEN_INPUT_INERACTIONS_PERIOD):
-        for character in text:
-            wait_interval = 0 if wait_interval <= 0 else wait_interval
-            pyautogui.typewrite(character, interval=wait_interval)
+    @staticmethod
+    def type_text_in_keyboard(text, wait_interval=config.WAIT_BETWEEN_INPUT_INERACTIONS_PERIOD):
+        pyautogui.typewrite(text, interval=wait_interval)

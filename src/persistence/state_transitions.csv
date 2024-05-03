@@ -1,0 +1,5 @@
+Initial State,Actions,Final State,Name
+./src/persistence/state_pkls/state3.pkl,./src/persistence/add_client.csv,./src/persistence/state_pkls/state4.pkl,add_client
+./src/persistence/state_pkls/state3.pkl,./src/persistence/edit_client.csv,./src/persistence/state_pkls/state10.pkl,edit_client
+./src/persistence/state_pkls/state3.pkl,./src/persistence/add_vehicle.csv,./src/persistence/state_pkls/state13.pkl,add_vehicle
+./src/persistence/state_pkls/state3.pkl,./src/persistence/edit_vehicle.csv,./src/persistence/state_pkls/state13.pkl,edit_vehicle
