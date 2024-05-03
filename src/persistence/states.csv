@@ -1,0 +1,5 @@
+state_name,screenshot_path,pkl_path,ui_path,id_text_in_ui
+state3,./src/persistence/state_screenshots/state3.png,./src/persistence/state_pkls/state3.pkl,./src/persistence/uis/state3.pkl,Aplicaciones
+state4,./src/persistence/state_screenshots/state4.png,./src/persistence/state_pkls/state4.pkl,./src/persistence/uis/state4.pkl,Datos cliente|-NIF no valido|-NIF ya existe
+state9,./src/persistence/state_screenshots/state9.png,./src/persistence/state_pkls/state9.pkl,./src/persistence/uis/state9.pkl,NIF no valido
+state13,./src/persistence/state_screenshots/state13.png,./src/persistence/state_pkls/state13.pkl,./src/persistence/uis/state13.pkl,Datos|-de bastidor no valido.|-no valida.
